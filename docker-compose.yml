@@ -16,7 +16,7 @@ services:
       - test_shop
   app:
     build:
-      context: /docker
+      context: ./docker
       dockerfile: dockerfiles/Php.Dockerfile
     container_name: app_shop
     restart: always
