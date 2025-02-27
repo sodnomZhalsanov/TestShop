@@ -1,0 +1,54 @@
+version: "3.7"
+
+services:
+  nginx:
+    image: nginx
+    container_name: web_test_shop
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+    networks:
+      - test_shop
+  app:
+    build:
+      context: /docker
+      dockerfile: dockerfiles/Php.Dockerfile
+    container_name: app_shop
+    restart: always
+    networks:
+      - test_shop
+    volumes:
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./app:/var/www/html
+    env_file:
+      - .env
+  db:
+    image: postgres:14
+    container_name: db_shop
+    restart: always
+    networks:
+      - test_shop
+    environment:
+      POSTGRES_USER: ${DB_PASS}
+      POSTGRES_PASSWORD: ${DB_USER}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ${PATH_DB}:/var/lib/postgresql/data/pgdata
+      - ${PATH_DUMPS}:/home/dumps
+    ports:
+      - "${DB_PORT}:5432"
+
+networks:
+  test_shop:
+    driver: bridge
+
+
+
+
+
+
