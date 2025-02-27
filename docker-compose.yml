@@ -3,43 +3,49 @@ version: "3.7"
 services:
   nginx:
     image: nginx
-    container_name: web_test_shop
+    container_name: nginx_test_shop
     restart: always
     depends_on:
       - app
     ports:
-      - "8080:80"
+      - "${PROJECT_PORT}:80"
     volumes:
       - ./app:/var/www/html
-      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+      - ./docker//nginx/vhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker//logs/nginx:/var/log/nginx/
     networks:
       - test_shop
   app:
     build:
       context: ./docker
       dockerfile: dockerfiles/Php.Dockerfile
-    container_name: app_shop
+    image: php82-fpm
+    container_name: app_test_shop
     restart: always
-    networks:
-      - test_shop
+    environment:
+      XDEBUG_CONFIG: "client_port=${XDEBUG_PORT} client_host=${XDEBUG_HOST}"
+      PHP_IDE_CONFIG: "serverName=php82"
+      PHP_INI_SCAN_DIR: "/usr/local/etc/php/custom.d:/usr/local/etc/php/conf.d"
+      APP_ENV: local
+      CONTAINER_ROLE: app
     volumes:
-      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./app:/var/www/html
-    env_file:
-      - .env
-  db:
-    image: postgres:14
-    container_name: db_shop
-    restart: always
     networks:
       - test_shop
+  pgdb:
+    image: postgres:15
+    container_name: postgres_test_shop
+    restart: always
     environment:
       POSTGRES_USER: ${DB_PASS}
       POSTGRES_PASSWORD: ${DB_USER}
+      POSTGRES_DB: ${DB_DATABASE}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ${PATH_DB}:/var/lib/postgresql/data/pgdata
       - ${PATH_DUMPS}:/home/dumps
+    networks:
+      - test_shop
     ports:
       - "${DB_PORT}:5432"
 
