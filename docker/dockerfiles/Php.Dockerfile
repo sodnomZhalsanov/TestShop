@@ -45,6 +45,10 @@ RUN chown -R www-data:www-data /var/www/html
 
 RUN mkdir /var/www/.composer && chown -R www-data:www-data /var/www/.composer
 
+# Install Symfony CLI
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash
+RUN apt install symfony-cli -y
+
 ENV LANG ru_RU.UTF-8
 ENV LC_ALL ru_RU.UTF-8
 
