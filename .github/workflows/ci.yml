@@ -1,0 +1,7 @@
+on:
+  push:
+    branches:
+      - main  # Запускать только при пуше в ветку main
+  pull_request:
+    branches:
+      - main  # Запускать при создании PR в ветку main
