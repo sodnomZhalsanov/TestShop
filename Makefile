@@ -22,6 +22,9 @@ clear-cache:
 migrate:
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction
 
+lint:
+	$(COMPOSER) run cs-fix
+	$(COMPOSER) run phpstan
 
 # Сборка проекта (установка зависимостей, миграции, очистка кеша)
 build: install migrate clear-cache
